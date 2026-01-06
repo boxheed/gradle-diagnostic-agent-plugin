@@ -1,50 +1,55 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# speckit Constitution
+<!--
+Sync Impact Report:
+- Version change: none -> 1.0.0
+- Modified principles: none
+- Added sections:
+    - Principle: Strict Type Safety & Immutability (The Foundation)
+    - Principle: The "Integration-First" Testing Strategy
+    - Principle: User Experience & Consistency (The "Polite Application" Rule)
+    - Principle: Clean Architecture & Separation of Concerns
+    - Principle: Performance & Resource Hygiene
+    - Principle: Dependency & Governance
+- Removed sections: none
+- Templates requiring updates:
+    - ✅ .specify/templates/plan-template.md
+    - ✅ .specify/templates/spec-template.md
+    - ✅ .specify/templates/tasks-template.md
+- Follow-up TODOs: none
+-->
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Strict Type Safety & Immutability (The Foundation)
+- Enforce strict typing (no `any`).
+- Data structures must be immutable by default (read-only across boundaries).
+- State mutations are strictly isolated to specific layers; data passed between layers must be pure.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. The "Integration-First" Testing Strategy
+- **Tests as Specs**: Tests must describe user behavior/outcomes, not implementation details.
+- **The Red-Green-Refactor Rule**: No implementation code can be written without a preceding failing test.
+- **Boundary Strategy**: Use real instances for internal logic (integration) but mock external volatile systems (Network/APIs) to ensure determinism.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. User Experience & Consistency (The "Polite Application" Rule)
+- **Predictability**: Interfaces (CLI flags, API endpoints) must follow consistent naming patterns (e.g., standard casing, verb-noun structures).
+- **Helpful Failure**: Error messages must be actionable. Never return raw stack traces to the user; provide a summary and a suggested fix.
+- **Responsiveness**: Long-running operations must provide feedback (progress indicators). The main thread/UI must never block.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Clean Architecture & Separation of Concerns
+- **Dependency Rule**: High-level business rules must never depend on low-level infrastructure (DB, UI, Frameworks).
+- **Port/Adapter Pattern**: External tools are plugins. Changing a database or UI framework should not require refactoring business logic.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Performance & Resource Hygiene
+- **Lazy by Default**: Defer heavy module loading or processing until strict execution time.
+- **Resource Respect**: Clean up file handles, connections, and memory immediately after use.
+- **Streaming**: Prefer streaming data processing over loading large datasets entirely into memory.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### VI. Dependency & Governance
+- **Standard Library First**: Do not import third-party packages for trivial tasks (e.g., `left-pad`).
+- **Security First**: Input validation must occur at the system entry point. Trust no input.
+- **Documentation**: Complex logic requires "Why" comments explaining the rationale, not just "What" the code does.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This Constitution is the immutable "Source of Truth" for all code generation and project development. It supersedes all other practices. Amendments require a formal proposal, review, and an approved migration plan for existing code. All pull requests and code reviews must verify compliance with these principles. Complexity or deviation from these principles must be explicitly justified and approved.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-01-06 | **Last Amended**: 2026-01-06

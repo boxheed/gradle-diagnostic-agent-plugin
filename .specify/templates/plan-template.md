@@ -31,7 +31,28 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **Strict Type Safety & Immutability**:
+  - [ ] All new data structures are strictly typed.
+  - [ ] Immutability is enforced at boundaries.
+  - [ ] State mutations are isolated.
+- **"Integration-First" Testing Strategy**:
+  - [ ] A failing test precedes all implementation.
+  - [ ] Tests focus on user behavior/outcomes.
+- **User Experience & Consistency**:
+  - [ ] New interfaces follow established naming patterns.
+  - [ ] Error handling is user-centric and actionable.
+  - [ ] Long-running operations provide feedback.
+- **Clean Architecture & Separation of Concerns**:
+  - [ ] Business logic is independent of infrastructure.
+  - [ ] External tools are treated as plugins.
+- **Performance & Resource Hygiene**:
+  - [ ] Heavy operations are deferred (lazy loading).
+  - [ ] Resources are managed and cleaned up effectively.
+  - [ ] Streaming is used for large data sets where applicable.
+- **Dependency & Governance**:
+  - [ ] Third-party dependencies are minimized and justified.
+  - [ ] All inputs are validated at the system boundary.
+  - [ ] Complex logic includes explanatory "Why" comments.
 
 ## Project Structure
 
