@@ -1,45 +1,49 @@
 package com.example.buildintelligence.services
 
 import com.example.buildintelligence.caching.FileBasedCache
-import com.example.buildintelligence.dsl.BuildIntelligenceExtension
 import com.example.buildintelligence.model.Payload
 import com.example.buildintelligence.reporting.ConsoleReporter
 import com.example.buildintelligence.spi.LlmProvider
-import com.example.buildintelligence.worker.BuildAnalysisWorkAction
-import org.gradle.api.Project
-import org.gradle.api.provider.Provider
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
-import org.gradle.api.tasks.Input
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
 import org.gradle.tooling.events.task.TaskFinishEvent
-import org.gradle.workers.WorkerExecutor
+import org.gradle.api.logging.Logging
+import org.gradle.api.model.ObjectFactory
 
 import javax.inject.Inject
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 interface TelemetryParameters extends BuildServiceParameters {
-    @Input
-    Project getProject()
+    Property<Boolean> getEnabled()
+    Property<Boolean> getDryRun()
+    Property<String> getActiveProvider()
+    DirectoryProperty getGradleUserHomeDir()
+    MapProperty<String, String> getProviders()
 }
 
-abstract class BuildTelemetryService implements BuildService<TelemetryParameters>, OperationCompletionListener {
+abstract class BuildTelemetryService implements BuildService<TelemetryParameters>, OperationCompletionListener, AutoCloseable {
 
-    private final WorkerExecutor workerExecutor
-    private final Project project
+    private final ExecutorService executor = Executors.newSingleThreadExecutor()
     private final FileBasedCache cache
+    private final org.gradle.api.logging.Logger logger = Logging.getLogger(BuildTelemetryService.class)
+    private final ObjectFactory objectFactory
 
     @Inject
-    BuildTelemetryService(WorkerExecutor workerExecutor) {
-        this.workerExecutor = workerExecutor
-        this.project = parameters.project
-        this.cache = new FileBasedCache(project.gradle.gradleUserHomeDir)
+    BuildTelemetryService(ObjectFactory objectFactory) {
+        this.objectFactory = objectFactory
+        this.cache = new FileBasedCache(parameters.gradleUserHomeDir.get().asFile)
     }
 
     @Override
     void onFinish(FinishEvent event) {
-        def extension = project.extensions.getByType(BuildIntelligenceExtension)
-        if (!extension.enabled.getOrElse(true)) {
+        if (!parameters.enabled.getOrElse(true)) {
             return
         }
 
@@ -51,7 +55,7 @@ abstract class BuildTelemetryService implements BuildService<TelemetryParameters
             def cacheKey = rawLog
             def cachedResponse = cache.get(cacheKey)
             if (cachedResponse != null) {
-                project.logger.lifecycle("[BuildIntelligence] Found cached analysis.")
+                logger.lifecycle("[BuildIntelligence] Found cached analysis.")
                 new ConsoleReporter().report(cachedResponse)
                 return
             }
@@ -69,31 +73,69 @@ abstract class BuildTelemetryService implements BuildService<TelemetryParameters
                 environmentContext: [:]
             )
 
-            if (extension.dryRun.getOrElse(false)) {
-                project.logger.lifecycle("[BuildIntelligence] DRY RUN: Payload that would be sent:")
-                project.logger.lifecycle(payload.toString())
+            if (parameters.dryRun.getOrElse(false)) {
+                logger.lifecycle("[BuildIntelligence] DRY RUN: Payload that would be sent:")
+                logger.lifecycle(payload.toString())
                 return
             }
 
-            def providerName = extension.activeProvider.get()
-            def provider = extension.providers.findByName(providerName)
-            if (provider == null) {
-                project.logger.warn("[BuildIntelligence] Active provider '${providerName}' not found.")
+            def providerName = parameters.activeProvider.get()
+            def providerClassName = parameters.providers.get().get(providerName)
+
+            if (providerClassName == null) {
+                logger.warn("[BuildIntelligence] Active provider '${providerName}' not found.")
                 return
             }
             
+            if (Boolean.getBoolean("buildintelligence.testing")) {
+                runAnalysis(payload, providerClassName, providerName, cacheKey)
+            } else {
+                executor.submit {
+                    runAnalysis(payload, providerClassName, providerName, cacheKey)
+                }
+            }
+        }
+    }
+
+    private void runAnalysis(Payload payload, String providerClassName, String providerName, String cacheKey) {
+        try {
+            Class<?> providerClass = Class.forName(providerClassName)
+            // Use ObjectFactory to create instance, allowing injection and name passing
+            // We pass providerName assuming the constructor takes String name, or fallback to no-arg
+            def provider
+            try {
+                provider = (LlmProvider) objectFactory.newInstance(providerClass, providerName)
+            } catch (Exception e) {
+                // Fallback to no-arg or other means if needed, but objectFactory should handle it
+                 provider = (LlmProvider) objectFactory.newInstance(providerClass)
+            }
+
             // Version Check
             if (provider.version != "1.0") {
-                project.logger.warn("[BuildIntelligence] Provider '${providerName}' has incompatible version '${provider.version}'. Expected '1.0'.")
+                logger.warn("[BuildIntelligence] Provider '${providerName}' has incompatible version '${provider.version}'. Expected '1.0'.")
                 return
             }
             
-            // This part will need more refactoring to pass provider info to the worker
-            // and to handle the response for caching.
-            def workQueue = workerExecutor.noIsolation()
-            workQueue.submit(BuildAnalysisWorkAction) { parameters ->
-                parameters.payload.set(payload)
+            def response = provider.analyze(payload)
+            def reporter = new ConsoleReporter()
+            reporter.report(response)
+
+            // Cache the response
+            cache.put(cacheKey, response)
+        } catch (Exception e) {
+            logger.error("Error running build intelligence analysis", e)
+        }
+    }
+
+    @Override
+    void close() throws Exception {
+        executor.shutdown()
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow()
             }
+        } catch (InterruptedException e) {
+            executor.shutdownNow()
         }
     }
 }

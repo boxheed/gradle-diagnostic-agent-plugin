@@ -26,7 +26,7 @@ class MvpFlowIntegrationTest extends BaseSpecification {
     @Unroll
     def "failing build triggers mock analysis"() {
         when:
-        def result = runAndFail('failingTask')
+        def result = runAndFail('failingTask', '-Dbuildintelligence.testing=true')
 
         then:
         result.output.contains("=== Build Intelligence Analysis ===")

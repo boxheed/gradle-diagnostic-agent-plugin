@@ -16,7 +16,17 @@ class DslConfigurationIntegrationTest extends BaseSpecification {
             }
             
             // A simple provider for testing configuration
+            import javax.inject.Inject
             class TestProvider implements com.example.buildintelligence.spi.LlmProvider {
+                private final String name
+
+                @Inject
+                TestProvider(String name) {
+                    this.name = name
+                }
+
+                String getName() { return name }
+
                 String version = "1.0"
                 com.example.buildintelligence.model.Response analyze(com.example.buildintelligence.model.Payload p) { null }
             }
@@ -25,6 +35,7 @@ class DslConfigurationIntegrationTest extends BaseSpecification {
                 enabled = true
                 activeProvider = "test"
                 providers {
+                    registerBinding(TestProvider, TestProvider)
                     create("test", TestProvider) {
                         // no params needed
                     }

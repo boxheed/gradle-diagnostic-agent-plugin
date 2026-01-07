@@ -9,11 +9,27 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import javax.inject.Inject
 
 class OpenAiProvider implements LlmProvider {
+    private final String name
     String apiKey
     String endpoint
     String model
+
+    @Inject
+    OpenAiProvider(String name) {
+        this.name = name
+    }
+
+    OpenAiProvider() {
+        this.name = "openai"
+    }
+
+    @Override
+    String getName() {
+        return name
+    }
 
     @Override
     String getVersion() {
