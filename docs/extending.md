@@ -4,13 +4,13 @@ The BuildIntelligence plugin is designed to be extensible, allowing you to creat
 
 ## 1. The `LlmProvider` Interface
 
-The core of the provider mechanism is the `com.example.buildintelligence.spi.LlmProvider` interface. Your custom provider must implement this interface.
+The core of the provider mechanism is the `com.fizzpod.buildintelligence.spi.LlmProvider` interface. Your custom provider must implement this interface.
 
 ```groovy
-package com.example.buildintelligence.spi
+package com.fizzpod.buildintelligence.spi
 
-import com.example.buildintelligence.model.Payload
-import com.example.buildintelligence.model.Response
+import com.fizzpod.buildintelligence.model.Payload
+import com.fizzpod.buildintelligence.model.Response
 
 interface LlmProvider {
     String getVersion()
@@ -28,9 +28,9 @@ Here is an example of a custom provider:
 ```groovy
 package com.mycompany.ai
 
-import com.example.buildintelligence.model.Payload
-import com.example.buildintelligence.model.Response
-import com.example.buildintelligence.spi.LlmProvider
+import com.fizzpod.buildintelligence.model.Payload
+import com.fizzpod.buildintelligence.model.Response
+import com.fizzpod.buildintelligence.spi.LlmProvider
 
 class MyInternalProvider implements LlmProvider {
     @Override
@@ -62,10 +62,10 @@ class MyInternalProvider implements LlmProvider {
 To make your provider discoverable by the BuildIntelligence plugin, you must use Java's standard `ServiceLoader` mechanism.
 
 1.  In your provider's source code, create the following directory: `src/main/resources/META-INF/services/`.
-2.  Inside that directory, create a file named exactly `com.example.buildintelligence.spi.LlmProvider`.
+2.  Inside that directory, create a file named exactly `com.fizzpod.buildintelligence.spi.LlmProvider`.
 3.  In this file, add a single line with the fully qualified class name of your provider implementation.
 
-**File: `src/main/resources/META-INF/services/com.example.buildintelligence.spi.LlmProvider`**
+**File: `src/main/resources/META-INF/services/com.fizzpod.buildintelligence.spi.LlmProvider`**
 ```
 com.mycompany.ai.MyInternalProvider
 ```
@@ -90,7 +90,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.example.build-intelligence'
+    id 'com.fizzpod.build-intelligence'
 }
 
 buildIntelligence {

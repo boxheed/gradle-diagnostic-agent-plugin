@@ -15,8 +15,8 @@ gradlePlugin {
     testSourceSets(sourceSets.test)
     plugins {
         buildIntelligence {
-            id = 'com.example.build-intelligence'
-            implementationClass = 'com.example.buildintelligence.BuildIntelligencePlugin'
+            id = 'com.fizzpod.build-intelligence'
+            implementationClass = 'com.fizzpod.buildintelligence.BuildIntelligencePlugin'
         }
     }
 }

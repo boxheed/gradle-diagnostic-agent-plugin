@@ -1,4 +1,4 @@
 allprojects {
-    group = 'com.example.build-intelligence'
+    group = 'com.fizzpod.build-intelligence'
     version = '1.0.0'
 }

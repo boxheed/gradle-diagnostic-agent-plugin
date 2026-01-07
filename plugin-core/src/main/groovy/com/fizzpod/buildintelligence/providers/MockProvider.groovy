@@ -1,21 +1,20 @@
-package com.sample
-
+package com.fizzpod.buildintelligence.providers
 import com.fizzpod.buildintelligence.model.Payload
 import com.fizzpod.buildintelligence.model.Response
 import com.fizzpod.buildintelligence.spi.LlmProvider
 
 import javax.inject.Inject
 
-class SampleProvider implements LlmProvider {
+class MockProvider implements LlmProvider {
     private final String name
 
     @Inject
-    SampleProvider(String name) {
+    MockProvider(String name) {
         this.name = name
     }
 
-    SampleProvider() {
-        this.name = "sample"
+    MockProvider() {
+        this.name = "mock"
     }
 
     @Override
@@ -31,8 +30,8 @@ class SampleProvider implements LlmProvider {
     @Override
     Response analyze(Payload payload) {
         return new Response(
-            analysis: "Analysis from the sample third-party provider!",
-            providerId: "sample-provider",
+            analysis: "This is a mock analysis for the build failure.",
+            providerId: "mock-provider",
             metadata: [:]
         )
     }

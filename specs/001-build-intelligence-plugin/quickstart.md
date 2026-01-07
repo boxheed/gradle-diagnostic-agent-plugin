@@ -9,7 +9,7 @@ First, apply the plugin to your `build.gradle` file. The plugin will be publishe
 **`build.gradle`**
 ```groovy
 plugins {
-    id 'com.example.build-intelligence' version '1.0.0'
+    id 'com.fizzpod.build-intelligence' version '1.0.0'
 }
 ```
 
