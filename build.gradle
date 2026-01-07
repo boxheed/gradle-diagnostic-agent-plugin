@@ -1,0 +1,4 @@
+allprojects {
+    group = 'com.example.build-intelligence'
+    version = '1.0.0'
+}

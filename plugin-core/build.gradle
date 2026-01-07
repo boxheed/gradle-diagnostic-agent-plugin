@@ -1,0 +1,30 @@
+plugins {
+    id 'groovy'
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    mavenCentral()
+}
+
+gradlePlugin {
+    testSourceSets(sourceSets.test)
+    plugins {
+        buildIntelligence {
+            id = 'com.example.build-intelligence'
+            implementationClass = 'com.example.buildintelligence.BuildIntelligencePlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    testImplementation 'org.spockframework:spock-core:2.4-groovy-4.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation project(':sample-provider')
+}
+
+test {
+    useJUnitPlatform()
+}

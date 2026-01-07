@@ -1,0 +1,21 @@
+# Gradle
+.gradle
+build/
+!build/cache/
+
+# IDE
+.idea/
+*.iml
+out/
+
+# Local files
+*.log
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Secrets
+*.env
+.env.*
+!.env.example

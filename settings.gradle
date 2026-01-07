@@ -1,0 +1,5 @@
+rootProject.name = 'build-intelligence-plugin'
+
+include ':plugin-core'
+include ':plugin-providers'
+include ':sample-provider'
