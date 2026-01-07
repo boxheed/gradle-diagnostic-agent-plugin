@@ -25,7 +25,7 @@ class ProviderDiscoveryIntegrationTest extends BaseSpecification {
                     def ext = project.extensions.getByType(com.example.buildintelligence.dsl.BuildIntelligenceExtension)
                     def provider = ext.providers.findByName("sampleprovider")
                     assert provider != null
-                    println "Found provider: ${provider.name}"
+                    println "Found provider: \${provider.name}"
                 }
             }
         """

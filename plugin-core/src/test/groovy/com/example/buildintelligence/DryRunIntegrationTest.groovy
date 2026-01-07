@@ -19,9 +19,6 @@ class DryRunIntegrationTest extends BaseSpecification {
                 dryRun = true
                 // We don't need a real provider for this test
                 activeProvider = "mock"
-                providers {
-                    create("mock", com.example.buildintelligence.providers.MockProvider) {}
-                }
             }
 
             task failingTask {

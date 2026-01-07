@@ -7,6 +7,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    testPluginClasspath
+}
+
 gradlePlugin {
     testSourceSets(sourceSets.test)
     plugins {
@@ -17,12 +21,17 @@ gradlePlugin {
     }
 }
 
+tasks.named('pluginUnderTestMetadata') {
+    pluginClasspath.from(configurations.testPluginClasspath)
+}
+
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
     testImplementation 'org.spockframework:spock-core:2.4-groovy-4.0'
     testImplementation 'org.junit.platform:junit-platform-launcher'
     testImplementation project(':sample-provider')
+    testPluginClasspath project(':sample-provider')
 }
 
 test {

@@ -2,7 +2,7 @@ package com.example.buildintelligence.dsl
 
 import com.example.buildintelligence.spi.LlmProvider
 import org.gradle.api.Action
-import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.PolymorphicDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 
@@ -26,6 +26,13 @@ import javax.inject.Inject
  * ```
  */
 abstract class BuildIntelligenceExtension {
+    private final PolymorphicDomainObjectContainer<LlmProvider> providers
+
+    @Inject
+    BuildIntelligenceExtension(ObjectFactory objectFactory) {
+        this.providers = objectFactory.polymorphicDomainObjectContainer(LlmProvider.class)
+    }
+
     /**
      * Enables or disables the plugin. Default is `true`.
      */
@@ -45,12 +52,14 @@ abstract class BuildIntelligenceExtension {
     /**
      * The container for all configured LLM providers.
      */
-    abstract NamedDomainObjectContainer<LlmProvider> getProviders()
+    PolymorphicDomainObjectContainer<LlmProvider> getProviders() {
+        return providers
+    }
 
     /**
      * Configures the provider container.
      */
-    void providers(Action<? super NamedDomainObjectContainer<LlmProvider>> action) {
+    void providers(Action<? super PolymorphicDomainObjectContainer<LlmProvider>> action) {
         action.execute(getProviders())
     }
 }

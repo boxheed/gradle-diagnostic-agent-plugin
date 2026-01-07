@@ -2,6 +2,7 @@ package com.example.buildintelligence.spi
 
 import com.example.buildintelligence.model.Payload
 import com.example.buildintelligence.model.Response
+import org.gradle.api.Named
 
 /**
  * Service Provider Interface (SPI) for a pluggable Large Language Model (LLM) provider.
@@ -9,7 +10,7 @@ import com.example.buildintelligence.model.Response
  * Implementations of this interface can be discovered by the BuildIntelligence plugin
  * to provide analysis for build failures.
  */
-interface LlmProvider {
+interface LlmProvider extends Named {
 
     /**
      * The version of the SPI this provider implements. This is used by the plugin
